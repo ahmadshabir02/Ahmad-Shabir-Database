@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>عمر الصفاء O.P.D مدریت مالی کلینیک</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<style>
+body { font-family: Vazirmatn, sans-serif; direction: rtl; text-align: right; margin: 20px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border: 1px solid #444; padding: 6px; text-align: center; }
+th { background-color: #eee; }
+input, button { margin: 5px; padding: 6px; }
+#filters { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<h2>عمر الصفاء O.P.D مدریت مالی کلینیک</h2>
+
+<div>
+  <button onclick="addIncome()">➕ ثبت پول از ریاست</button>
+  <button onclick="addExpense()">➖ ثبت خریداری</button>
+  <button onclick="exportPDF()">📄 خروجی PDF</button>
+  <button onclick="clearAll()">🧹 پاک کردن همه</button>
+</div>
+
+<div id="filters">
+  <input type="text" id="searchPerson" placeholder="جستجو بر اساس اسم شخص" oninput="applyFilters()">
+  <input type="text" id="searchDesc" placeholder="جستجو بر اساس شرح" oninput="applyFilters()">
+  <label>از تاریخ:</label>
+  <input type="date" id="startDate" onchange="applyFilters()">
+  <label>تا تاریخ:</label>
+  <input type="date" id="endDate" onchange="applyFilters()">
+</div>
+
+<table id="financeTable">
+<thead>
+<tr>
+<th>#</th>
+<th>تاریخ</th>
+<th>ساعت</th>
+<th>شرح</th>
+<th>شخص خریداری‌کننده</th>
+<th>مبلغ (AFN)</th>
+<th>باقی‌مانده (AFN)</th>
+<th>عملیات</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+let balance = 0;
+let tableBody = document.querySelector("#financeTable tbody");
+
+function addIncome() {
+  let amount = prompt("مبلغ پول دریافتی را وارد کنید:");
+  if (amount) {
+    balance += parseInt(amount);
+    addRow("درآمد از ریاست", "ریاست", amount);
+  }
+}
+
+function addExpense() {
+  let amount = prompt("مبلغ خریداری را وارد کنید:");
+  let person = prompt("اسم شخص خریداری کننده را وارد کنید:");
+  if (amount && person) {
+    balance -= parseInt(amount);
+    addRow("خریداری", person, amount);
+  }
+}
+
+function addRow(desc, person, amount) {
+  let row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${tableBody.rows.length + 1}</td>
+    <td>${new Date().toLocaleDateString()}</td>
+    <td>${new Date().toLocaleTimeString()}</td>
+    <td>${desc}</td>
+    <td>${person}</td>
+    <td>${amount}</td>
+    <td>${balance}</td>
+    <td><button onclick="this.closest('tr').remove()">❌ حذف</button></td>
+  `;
+  tableBody.appendChild(row);
+}
+
+function clearAll() {
+  if (confirm("آیا مطمئن هستی که همه داده‌ها پاک شوند؟")) {
+    tableBody.innerHTML = "";
+    balance = 0;
+  }
+}
+
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+  doc.text("عمر الصفاء O.P.D مدریت مالی کلینیک", 10, 10);
+  doc.autoTable({ html: "#financeTable" });
+  doc.save("report.pdf");
+}
+
+function applyFilters() {
+  let personFilter = document.getElementById("searchPerson").value;
+  let descFilter = document.getElementById("searchDesc").value;
+  let startDate = document.getElementById("startDate").value;
+  let endDate = document.getElementById("endDate").value;
+
+  Array.from(tableBody.rows).forEach(row => {
+    let person = row.cells[4].innerText;
+    let desc = row.cells[3].innerText;
+    let date = row.cells[1].innerText;
+
+    let visible = true;
+    if (personFilter && !person.includes(personFilter)) visible = false;
+    if (descFilter && !desc.includes(descFilter)) visible = false;
+    if (startDate && new Date(date) < new Date(startDate)) visible = false;
+    if (endDate && new Date(date) > new Date(endDate)) visible = false;
+
+    row.style.display = visible ? "" : "none";
+  });
+}
+</script>
+</body>
+</html>
