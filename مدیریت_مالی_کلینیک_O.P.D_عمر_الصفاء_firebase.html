@@ -6,6 +6,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-jalaali/0.9.1/moment-jalaali.min.js"></script> <!-- اضافه کردن کتابخانه moment-jalaali -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.1/dist/js/persian-datepicker.min.js"></script> <!-- اضافه کردن کتابخانه PersianDatePicker برای تقویم شمسی -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.1/dist/css/persian-datepicker.min.css"> <!-- اضافه کردن CSS برای PersianDatePicker -->
 <style>
 body { font-family: Vazirmatn, sans-serif; direction: rtl; text-align: right; margin: 20px; }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -29,9 +32,9 @@ input, button { margin: 5px; padding: 6px; }
   <input type="text" id="searchPerson" placeholder="جستجو بر اساس اسم شخص" oninput="applyFilters()">
   <input type="text" id="searchDesc" placeholder="جستجو بر اساس شرح" oninput="applyFilters()">
   <label>از تاریخ:</label>
-  <input type="date" id="startDate" onchange="applyFilters()">
+  <input type="text" id="startDate" class="persian-datepicker" onchange="applyFilters()"> <!-- استفاده از PersianDatePicker برای تقویم شمسی -->
   <label>تا تاریخ:</label>
-  <input type="date" id="endDate" onchange="applyFilters()">
+  <input type="text" id="endDate" class="persian-datepicker" onchange="applyFilters()"> <!-- استفاده از PersianDatePicker برای تقویم شمسی -->
 </div>
 
 <table id="financeTable">
@@ -223,12 +226,16 @@ function applyFilters(returnFiltered=false){
   const startDate=document.getElementById("startDate").value;
   const endDate=document.getElementById("endDate").value;
 
+  // تبدیل تاریخ‌ها به هجری شمسی
+  const startDateJalali = startDate ? moment(startDate, 'jYYYY/jMM/jDD').format('jYYYY/jMM/jDD') : '';
+  const endDateJalali = endDate ? moment(endDate, 'jYYYY/jMM/jDD').format('jYYYY/jMM/jDD') : '';
+
   const filtered=records.filter(rec=>{
     let valid=true;
     if(personFilter) valid=valid && rec.person && rec.person.toLowerCase().includes(personFilter);
     if(descFilter) valid=valid && rec.desc.toLowerCase().includes(descFilter);
-    if(startDate) valid=valid && rec.date>=startDate;
-    if(endDate) valid=valid && rec.date<=endDate;
+    if(startDateJalali) valid=valid && rec.date>=startDateJalali;
+    if(endDateJalali) valid=valid && rec.date<=endDateJalali;
     return valid;
   });
 
