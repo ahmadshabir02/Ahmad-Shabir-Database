@@ -27,53 +27,9 @@ input, button { margin: 5px; padding: 6px; }
   <button onclick="addIncome()">➕ ثبت درآمد</button>
   <button onclick="addExpense()">➖ ثبت خریداری</button>
   <button onclick="exportPDF()">📄 خروجی PDF</button>
-  <button onclick="clearAll()">🧹 پاک کردن همه</button>
 </div>
-
 <div id="filters">
-  <input type="text" id="searchPerson" placeholder="جستجو بر اساس اسم شخص" oninput="applyFilters()">
-  <input type="text" id="searchDesc" placeholder="جستجو بر اساس شرح" oninput="applyFilters()">
-  <label>از تاریخ:</label>
-  <input type="date" id="startDate" onchange="applyFilters()">
-  <label>تا تاریخ:</label>
-  <input type="date" id="endDate" onchange="applyFilters()">
-</div>
-    <!-- داده‌های جدول در اینجا قرار خواهند گرفت -->
-  </tbody>
-</table>
-
-<script>
-// تابع فیلتر کردن داده‌ها
-function applyFilters() {
-  const searchPerson = document.getElementById('searchPerson').value.toLowerCase();
-  const searchDesc = document.getElementById('searchDesc').value.toLowerCase();
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
-  const rows = document.querySelectorAll('#financeTable tbody tr');
-
-  rows.forEach(row => {
-    const personName = row.cells[4].textContent.toLowerCase();
-    const description = row.cells[3].textContent.toLowerCase();
-    const rowDate = row.cells[1].textContent;  // فرض بر این است که تاریخ در ستون 1 ذخیره شده است
-
-    // تبدیل تاریخ میلادی به تاریخ هجری شمسی
-    const rowDateShamsi = moment(rowDate, 'YYYY-MM-DD').format('jYYYY/jMM/jDD');
-
-    // مقایسه تاریخ‌ها به هجری شمسی
-    const isDateInRange = (!startDate || moment(rowDateShamsi, 'jYYYY/jMM/jDD').isSameOrAfter(startDate)) && 
-                          (!endDate || moment(rowDateShamsi, 'jYYYY/jMM/jDD').isSameOrBefore(endDate));
-
-    if (
-      personName.includes(searchPerson) && 
-      description.includes(searchDesc) && 
-      isDateInRange
-    ) {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
-    }
-  });
-}
+  <input typ
 </script>
 <table id="financeTable">
 <thead>
